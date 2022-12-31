@@ -13,7 +13,10 @@
 
 // #define SERIALLIB
 #define SERIAL_PORT "/dev/ttyUSB1"
+
+#ifdef SERIALLIB
 serialib serial;
+#endif
 
 using namespace std;
 
