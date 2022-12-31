@@ -137,30 +137,11 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/position_node.cpp)
 
-add_executable(map src/map.cpp)
-target_link_libraries(map ${catkin_LIBRARIES})
-
-add_executable(robot src/robot.cpp)
-target_link_libraries(robot ${catkin_LIBRARIES} bluetooth serialLib)
-
-add_executable(robot_vel src/robot_vel.cpp)
-target_link_libraries(robot_vel ${catkin_LIBRARIES} bluetooth)
-
-# add_executable(robot_controller src/robot_controller.cpp)
-# target_link_libraries(robot_controller ${catkin_LIBRARIES} bluetooth)
-
-add_executable(plot src/plot.cpp)
-target_link_libraries(plot ${catkin_LIBRARIES} bluetooth)
-
 add_library(serialLib src/serialib.cpp)
 
 add_executable(obstacle src/obstacle.cpp)
 target_link_libraries(obstacle ${catkin_LIBRARIES} bluetooth serialLib)
 add_dependencies(obstacle ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-add_executable(ps4 src/ps4.cpp)
-target_link_libraries(ps4 ${catkin_LIBRARIES})
-
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the

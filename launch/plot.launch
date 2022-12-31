@@ -1,6 +1,0 @@
-<launch>
-
-<node name="graph" pkg="rqt_plot" type="rqt_plot"/>
-<node name="plot" pkg="position" type="plot" output="screen"/>
-
-</launch>
