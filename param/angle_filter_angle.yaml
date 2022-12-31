@@ -1,0 +1,15 @@
+scan_filter_chain:
+- name: angle
+  type: laser_filters/LaserScanAngularBoundsFilter
+  params:
+    # 120deg
+    lower_angle: -1.05
+    upper_angle: 1.05
+
+    # 180 deg
+    lower_angle: -1.512
+    upper_angle: 1.512
+
+    # suitable to avoid scanning robot itself
+    lower_angle: -1.4
+    upper_angle: 1.4

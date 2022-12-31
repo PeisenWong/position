@@ -1,0 +1,13 @@
+<launch>
+    <!-- Map Generation -->
+    <node name="map" pkg="position" type="map">
+        <param name="X" value="-0.115"/>
+        <param name="Y" value="0.15"/>
+        <param name="Z" value="-0.05"/>
+        <param name="Yaw" value="-1.57"/>
+    </node>
+
+    <!-- Process obstacle data -->
+    <node name="rviz" pkg="rviz" type="rviz" output="screen" args="-d $(find obstacle_detector)/resources/obstacle_detector.rviz"/>
+
+</launch>

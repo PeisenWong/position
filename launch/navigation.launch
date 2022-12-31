@@ -1,0 +1,118 @@
+<launch>
+    <!-- Arguments -->
+    <arg name="mapFile" default="$(find position)/map/new_againlol2.yaml" />
+    <arg name="scan_topic"     default="scan_filtered"/>
+    <arg name="initial_pose_x" default="0.0"/>
+    <arg name="initial_pose_y" default="0.0"/>
+    <arg name="initial_pose_a" default="0.0"/>
+    <arg name="cmd_vel_topic" default="nav/cmd_vel" />
+    <arg name="odom_topic" default="/odometry/filtered" />
+    <arg name="move_forward_only" default="false"/>
+    
+    <!-- Extended Kalman Filter to publish filtered odom -->
+    <include file="$(find position)/launch/ekf_local_AMCL.launch"/>
+
+    <!-- Launch the lidar -->
+    <node name="rplidarNode"  pkg="rplidar_ros"  type="rplidarNode" output="screen">
+        <param name="serial_port"         type="string" value="/dev/rplidar"/>
+        <param name="serial_baudrate"     type="int"    value="256000"/><!--A1/A2 -->
+        <param name="frame_id"            type="string" value="base_scan"/>
+        <param name="inverted"            type="bool"   value="false"/>
+        <param name="angle_compensate"    type="bool"   value="true"/>
+    </node>
+
+    <node pkg="laser_filters" type="scan_to_scan_filter_chain" output="screen" name="laser_filter">
+      <rosparam command="load" file="$(find position)/param/angle_filter_angle.yaml" />
+      <param name="tf_message_filter_target_frame" value="base_scan"/>
+    </node>
+
+    <!-- For TF from turtlebot -->
+    <node pkg="position" type="robot" name="robot" />
+
+    <!-- Send Vel command to mainboard -->
+    <node name="send_vel" pkg="position" type="robot_vel" />
+
+    <!-- <node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="0 0 0 0 0 0 odom base_footprint 100" /> -->
+
+    <!-- TF configuration -->
+    <arg
+    name="bot" />
+    <param
+        name="robot_description"
+        textfile="$(find bot1_description_dev)/urdf/bot1_description_dev.urdf" />
+    <node
+        name="robot_state_publisher"
+        pkg="robot_state_publisher"
+        type="robot_state_publisher"
+        output = "log" />
+
+    <!-- Publish topic /map -->
+    <node pkg="map_server" type="map_server" name="map_server" args="$(arg mapFile)" />
+
+      <!-- AMCL -->
+    <node pkg="amcl" type="amcl" name="amcl">
+        <param name="min_particles"             value="500"/>
+        <param name="max_particles"             value="8000"/>
+        <param name="kld_err"                   value="0.01"/>
+        <param name="kld_z"                     value="0.99"/>
+        <param name="update_min_d"              value="0.10"/>
+        <param name="update_min_a"              value="0.10"/>
+        <param name="resample_interval"         value="2"/>
+        <param name="transform_tolerance"       value="0.1"/>
+        <param name="recovery_alpha_slow"       value="0.001"/>
+        <param name="recovery_alpha_fast"       value="0.1"/>
+        <param name="initial_pose_x"            value="$(arg initial_pose_x)"/>
+        <param name="initial_pose_y"            value="$(arg initial_pose_y)"/>
+        <param name="initial_pose_a"            value="$(arg initial_pose_a)"/>
+        <param name="gui_publish_rate"          value="50.0"/>
+        <param name="selective_resampling"      value="true" />
+
+        <remap from="scan"                      to="$(arg scan_topic)"/>
+        <param name="laser_min_range"           value="3.0"/>
+        <param name="laser_max_range"           value="15.0"/>
+        <param name="laser_max_beams"           value="8000"/>
+        <param name="laser_z_hit"               value="0.5"/>
+        <param name="laser_z_short"             value="0.05"/>
+        <param name="laser_z_max"               value="0.05"/>
+        <param name="laser_z_rand"              value="0.5"/>
+        <param name="laser_sigma_hit"           value="0.2"/>
+        <param name="laser_lambda_short"        value="0.1"/>
+        <param name="laser_likelihood_max_dist" value="6.0"/>
+        <param name="laser_model_type"          value="likelihood_field"/>
+
+        <param name="odom_model_type"           value="omni-corrected"/>
+        <param name="odom_alpha1"               value="0.005"/>
+        <param name="odom_alpha2"               value="0.005"/>
+        <param name="odom_alpha3"               value="0.010"/>
+        <param name="odom_alpha4"               value="0.005"/>
+        <param name="odom_alpha5"               value="0.003"/>
+        <param name="odom_frame_id"             value="odom"/>
+        <param name="base_frame_id"             value="base_link"/>
+        <param name="use_map_topic"             value="true"/>
+        <param name="first_map_only"           value="true"/> 
+    </node>
+
+    <!-- move_base -->
+    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+        <!-- <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
+        <rosparam file="$(find position)/param/dwa_local_planner_params.yaml" command="load" /> -->
+        <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" /> 
+        <rosparam file="$(find position)/param/teb_local_planner_params.yaml" command="load" /> 
+        <param name="DWAPlannerROS/min_vel_x" value="0.0" if="$(arg move_forward_only)" />
+        <param name="base_global_planner" value="global_planner/GlobalPlanner" />
+        <rosparam file="$(find position)/param/costmap_common_params.yaml" command="load" ns="global_costmap" />
+        <rosparam file="$(find position)/param/costmap_common_params.yaml" command="load" ns="local_costmap" />
+        <rosparam file="$(find position)/param/local_costmap_params.yaml" command="load" />
+        <rosparam file="$(find position)/param/global_costmap_params.yaml" command="load" />
+        <rosparam file="$(find position)/param/move_base_params.yaml" command="load" />
+        <remap from="cmd_vel" to="$(arg cmd_vel_topic)"/>
+        <remap from="odom" to="$(arg odom_topic)"/>
+        <remap from="scan" to="$(arg scan_topic)"/>
+    </node>
+
+    <!-- <node name="Controller" pkg="position" type="robot_controller" /> -->
+    
+    <!-- Rviz visualization -->
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find position)/rviz/navigation_teb.rviz"/>
+    <!-- <node pkg="rviz" type="rviz" name="rviz" args="-d $(find bot1_navigation)/rviz/bot1_navigation.rviz"/> -->
+</launch>

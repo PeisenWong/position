@@ -1,0 +1,5 @@
+<launch>
+    <node pkg="position" type="robot" name="robot" />
+    <node pkg="position" type="robot_vel" name="robot_vel" />
+    <node pkg="position" type="robot_controller" name="robot_controller" output="screen" />
+</launch>
