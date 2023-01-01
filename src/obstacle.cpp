@@ -11,7 +11,7 @@
 
 #include "position/serialib.h"
 
-// #define SERIALLIB
+#define SERIALLIB
 #define SERIAL_PORT "/dev/ttyUSB1"
 
 #ifdef SERIALLIB
@@ -61,7 +61,7 @@ void ObstacleCallback(const obstacle_detector::Obstacles obs)
                 pole.distance = sqrt(pow(circle.center.x, 2) + pow(circle.center.y, 2));
                 PoleList.push_back(pole);
                 counts++;
-                ROS_INFO("Circle %d at X: %lf Y: %lf Distance: %lf", counts, circle.center.x, circle.center.y, sqrt(pow(circle.center.x, 2) + pow(circle.center.y, 2)));
+                // ROS_INFO("Circle %d at X: %lf Y: %lf Distance: %lf", counts, circle.center.x, circle.center.y, sqrt(pow(circle.center.x, 2) + pow(circle.center.y, 2)));
             }
         }
     }
