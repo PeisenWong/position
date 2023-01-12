@@ -12,7 +12,7 @@
 #include "position/serialib.h"
 
 #define SERIALLIB
-#define SERIAL_PORT "/dev/ttyUSB1"
+#define SERIAL_PORT "/dev/ttyUSB2"
 
 #ifdef SERIALLIB
 serialib serial;
