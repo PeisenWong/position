@@ -82,7 +82,7 @@ void ObstacleCallback(const obstacle_detector::Obstacles obs)
         } while (recv(s, receive, 4, MSG_WAITALL) < 0);
 #else
         serial.writeBytes(sending, 5);
-        serial.readBytes(receive, 4, 10);
+        serial.readBytes(receive, 4, 100);
 #endif
         
         memcpy(&received_counts, &receive, 4);
@@ -105,7 +105,7 @@ void ObstacleCallback(const obstacle_detector::Obstacles obs)
         } while (recv(s, receive, PoleList.size() * 3 * 4, MSG_WAITALL) < 0);
 #else
         serial.writeBytes(sending, PoleList.size() * 3 * 4);
-        serial.readBytes(receive, PoleList.size() * 3 * 4, 10);
+        serial.readBytes(receive, PoleList.size() * 3 * 4, 100);
 #endif
         for(int i = 0; i < received_counts; i++)
         {
