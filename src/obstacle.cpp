@@ -13,10 +13,7 @@
 
 #define SERIALLIB
 #define SERIAL_PORT "/dev/ttyUSB1"
-
-#ifdef SERIALLIB
 serialib serial;
-#endif
 
 using namespace std;
 
@@ -61,7 +58,7 @@ void ObstacleCallback(const obstacle_detector::Obstacles obs)
                 pole.distance = sqrt(pow(circle.center.x, 2) + pow(circle.center.y, 2));
                 PoleList.push_back(pole);
                 counts++;
-                // ROS_INFO("Circle %d at X: %lf Y: %lf Distance: %lf", counts, circle.center.x, circle.center.y, sqrt(pow(circle.center.x, 2) + pow(circle.center.y, 2)));
+                ROS_INFO("Circle %d at X: %lf Y: %lf Distance: %lf", counts, circle.center.x, circle.center.y, sqrt(pow(circle.center.x, 2) + pow(circle.center.y, 2)));
             }
         }
     }
@@ -124,7 +121,7 @@ int main(int argc, char** argv)
 #ifndef SERIALLIB
     // To enable ps4 control from mainboard
     struct sockaddr_rc addr = { 0 };
-    char dest[18] = "98:DA:60:01:F0:E7";
+    char dest[18] = "98:D3:31:FD:5D:98";
 
     // allocate a socket
     s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
@@ -132,7 +129,7 @@ int main(int argc, char** argv)
     // set the connection parameters (who to connect to)
     addr.rc_family = AF_BLUETOOTH;
     addr.rc_channel = (uint8_t) 1;
-    str2ba( dest, &addr.rc_bdaddr );
+    str2ba( dest, &addr.rc_bdaddr );    
 
     // connect to server
     while(connect(s, (struct sockaddr *)&addr, sizeof(addr)) != 0)
