@@ -127,7 +127,7 @@
     </node>
 
     <!-- Process obstacle data -->
-    <!-- <node name="process" pkg="position" type="obstacle" output="screen"/> -->
+    <node name="process" pkg="position" type="obstacle" output="screen"/>
     <node name="rviz" pkg="rviz" type="rviz" output="screen" args="-d $(find obstacle_detector)/resources/obstacle_detector.rviz"/>
 
 </launch>

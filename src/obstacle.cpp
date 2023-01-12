@@ -11,7 +11,7 @@
 
 #include "position/serialib.h"
 
-// #define SERIALLIB
+#define SERIALLIB
 #define SERIAL_PORT "/dev/ttyUSB1"
 serialib serial;
 
@@ -79,12 +79,12 @@ void ObstacleCallback(const obstacle_detector::Obstacles obs)
         } while (recv(s, receive, 4, MSG_WAITALL) < 0);
 #else
         serial.writeBytes(sending, 5);
-        serial.readBytes(receive, 4, 10);
+        serial.readBytes(receive, 4, 100);
 #endif
         
         memcpy(&received_counts, &receive, 4);
 
-        if(received_counts != PoleList.size())
+        if(received_counts != counts)
             ROS_INFO("U fked up, received %d", received_counts);
         else
             ROS_INFO("Received %d", received_counts);
@@ -102,7 +102,7 @@ void ObstacleCallback(const obstacle_detector::Obstacles obs)
         } while (recv(s, receive, PoleList.size() * 3 * 4, MSG_WAITALL) < 0);
 #else
         serial.writeBytes(sending, PoleList.size() * 3 * 4);
-        serial.readBytes(receive, PoleList.size() * 3 * 4, 10);
+        serial.readBytes(receive, PoleList.size() * 3 * 4, 100);
 #endif
         for(int i = 0; i < received_counts; i++)
         {
@@ -121,7 +121,7 @@ int main(int argc, char** argv)
 #ifndef SERIALLIB
     // To enable ps4 control from mainboard
     struct sockaddr_rc addr = { 0 };
-    char dest[18] = "98:DA:60:01:F0:E7";
+    char dest[18] = "98:D3:31:FD:5D:98";
 
     // allocate a socket
     s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
@@ -129,7 +129,7 @@ int main(int argc, char** argv)
     // set the connection parameters (who to connect to)
     addr.rc_family = AF_BLUETOOTH;
     addr.rc_channel = (uint8_t) 1;
-    str2ba( dest, &addr.rc_bdaddr );
+    str2ba( dest, &addr.rc_bdaddr );    
 
     // connect to server
     while(connect(s, (struct sockaddr *)&addr, sizeof(addr)) != 0)
