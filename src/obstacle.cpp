@@ -87,7 +87,7 @@ void ObstacleCallback(const obstacle_detector::Obstacles obs)
         
         memcpy(&received_counts, &receive, 4);
 
-        if(received_counts != PoleList.size())
+        if(received_counts != counts)
             ROS_INFO("U fked up, received %d", received_counts);
         else
             ROS_INFO("Received %d", received_counts);
