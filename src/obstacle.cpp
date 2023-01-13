@@ -131,7 +131,7 @@ int main(int argc, char** argv)
     addr.rc_channel = (uint8_t) 1;
     str2ba( dest, &addr.rc_bdaddr );    
 
-    connect to server
+    // connect to server
     while(connect(s, (struct sockaddr *)&addr, sizeof(addr)) != 0)
     {
         ROS_INFO("Havent Connect");
