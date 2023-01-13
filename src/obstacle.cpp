@@ -53,8 +53,8 @@ void ObstacleCallback(const obstacle_detector::Obstacles obs)
             if((circle.true_radius >= p_min_r1 && circle.true_radius <= p_max_r1) 
             || (circle.true_radius >= p_min_r2 && circle.true_radius <= p_max_r2))
             {
-                pole.x = circle.center.x;
-                pole.y = circle.center.y;
+                pole.x = -circle.center.y;
+                pole.y = circle.center.x;
                 pole.distance = sqrt(pow(circle.center.x, 2) + pow(circle.center.y, 2));
                 PoleList.push_back(pole);
                 counts++;
