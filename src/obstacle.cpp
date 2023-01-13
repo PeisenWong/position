@@ -11,7 +11,8 @@
 
 #include "position/serialib.h"
 
-#define SERIALLIB
+// #define SERIALLIB
+// #define CONTINUOUS
 #define SERIAL_PORT "/dev/ttyUSB1"
 serialib serial;
 
@@ -23,6 +24,7 @@ int s;
 double distances;
 uint8_t receive[500], sending[500], ack = 0x01;
 double p_min_r1, p_max_r1, p_min_r2, p_max_r2;
+unsigned char instruction, response;
 
 typedef struct
 {
@@ -32,8 +34,25 @@ typedef struct
 } Pole;
 
 Pole pole;
-
 vector<Pole> PoleList;
+
+enum Instruction
+{
+    FAR,
+    NEAR,
+    ONE,
+    TWO,
+    THREE,
+    FOUR,
+    FIVE,
+    SIX
+};
+
+enum Response
+{
+    OK,
+    NO
+};
 
 // Format Communication
 // [0x01][Total No.][x distance][y distance][distance]...
@@ -67,6 +86,7 @@ void ObstacleCallback(const obstacle_detector::Obstacles obs)
         ROS_INFO("Bruh, no param");
     }
 
+#ifdef CONTINUOUS
     if(counts > 0 && counts <= 10)
     {
         memcpy(&sending[0], &ack, 1);
@@ -114,6 +134,7 @@ void ObstacleCallback(const obstacle_detector::Obstacles obs)
         ROS_INFO("Done\n");
         PoleList.clear();
     }
+#endif
 }
 
 int main(int argc, char** argv)
@@ -151,8 +172,74 @@ int main(int argc, char** argv)
     ros::NodeHandle n;
     ros::Subscriber sub = n.subscribe<obstacle_detector::Obstacles>("/tracked_obstacles", 10, ObstacleCallback);
 
-    ros::spin();
-    ros::waitForShutdown();
+    ros::AsyncSpinner spinner(3); 
+    spinner.start();
+
+    // ros::waitForShutdown();
+    while(1)
+    {
+        // Wait for instruction
+        static int state = 0;
+        switch(state)
+        {
+            case 0: 
+                recv(s, receive, 2, MSG_WAITALL);
+                if(receive[0] = 0x01)
+                {
+                    memcpy(&instruction, &receive[1], 1);
+
+                    switch(instruction)
+                    {
+                        case NEAR: // Give the nearest pole data
+                            if(PoleList.size())
+                            {
+                                Pole temp = PoleList.at(0);
+                                for(int i = 0; i < PoleList.size(); i++)
+                                {
+                                    if(fabs(Polelist.at(i).distance) < fabs(temp.distance))
+                                        temp = PoleList.at(i);
+                                }
+                                response = OK;
+                                state = 1;
+                            }
+                            else
+                            {
+                                response = NO;
+                                state = 0;
+                            }
+                        break;
+
+                        case FAR:
+                        // Process pole data
+                        break;
+
+                        case ONE:
+                        // Process pole data
+                        break;
+
+                        case TWO:
+                        // Process pole data
+                        break;
+
+                        case THREE:
+                        // Process pole data
+                        break;
+
+                        case FOUR:
+                        // Process pole data
+                        break;
+
+                        case FIVE:
+                        // Process pole data
+                        break;
+
+                        case SIX:
+                        // Process pole data
+                        break;
+                    }
+                }
+        }
+    }
 
 #ifndef SERIALLIB
     close(s);
