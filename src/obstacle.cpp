@@ -182,6 +182,22 @@ int main(int argc, char** argv)
     // ros::waitForShutdown();
     while(ros::ok())
     {
+        // Check for boot up
+        sending[0] = 0x01;
+        response = OK;
+        res = response;
+        sending[1] = res;
+
+        while(receive[0] != OK)
+        {
+            do
+            {
+                send(s, sending, 2, MSG_WAITALL);
+                ROS_INFO("Booting");
+            }
+            while(recv(s, receive, 1, MSG_WAITALL) < 0);
+        }
+
         // Wait for instruction
         recv(s, receive, 2, MSG_WAITALL);
 
