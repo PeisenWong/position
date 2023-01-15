@@ -19,24 +19,24 @@ serialib serial;
 using namespace std;
 
 int received_counts, counts;
-float received_x, received_y, received_distance, sent_x, sent_y, sent_distance;
+double received_x, received_y, received_distance, sent_x, sent_y, sent_distance, zero = 0;
 int s;
 double distances;
 uint8_t receive[500], sending[500], ack = 0x01;
 double p_min_r1, p_max_r1, p_min_r2, p_max_r2;
-unsigned char instruction, response;
+uint8_t inst, res, sent_res, received_res;
 
 typedef struct
 {
-    float x;
-    float y;
-    float distance;
+    double x;
+    double y;
+    double distance;
 } Pole;
 
-Pole pole;
+Pole pole, temp;
 vector<Pole> PoleList;
 
-enum Instruction
+typedef enum
 {
     FAR,
     NEAR,
@@ -46,13 +46,16 @@ enum Instruction
     FOUR,
     FIVE,
     SIX
-};
+}Instruction_t;
 
-enum Response
+typedef enum
 {
     OK,
     NO
-};
+}Response_t;
+
+Instruction_t instruction;
+Response_t response, received_response, sent_response;
 
 // Format Communication
 // [0x01][Total No.][x distance][y distance][distance]...
@@ -80,6 +83,7 @@ void ObstacleCallback(const obstacle_detector::Obstacles obs)
                 ROS_INFO("Circle %d at X: %lf Y: %lf Distance: %lf", counts, circle.center.x, circle.center.y, sqrt(pow(circle.center.x, 2) + pow(circle.center.y, 2)));
             }
         }
+        ROS_INFO("Done");
     }
     else
     {
@@ -172,73 +176,125 @@ int main(int argc, char** argv)
     ros::NodeHandle n;
     ros::Subscriber sub = n.subscribe<obstacle_detector::Obstacles>("/tracked_obstacles", 10, ObstacleCallback);
 
-    ros::AsyncSpinner spinner(3); 
+    ros::AsyncSpinner spinner(2); 
     spinner.start();
 
     // ros::waitForShutdown();
-    while(1)
+    while(ros::ok())
     {
         // Wait for instruction
-        static int state = 0;
-        switch(state)
+        recv(s, receive, 2, MSG_WAITALL);
+
+        if(receive[0] == 0x01)
         {
-            case 0: 
-                recv(s, receive, 2, MSG_WAITALL);
-                if(receive[0] = 0x01)
-                {
-                    memcpy(&instruction, &receive[1], 1);
-
-                    switch(instruction)
+            memcpy(&instruction, &receive[1], 1);
+            // instruction = inst;
+            switch(instruction)
+            {
+                case FAR: // Give the far pole data
+                    ROS_INFO("Far");
+                    if(PoleList.size())
                     {
-                        case NEAR: // Give the nearest pole data
-                            if(PoleList.size())
-                            {
-                                Pole temp = PoleList.at(0);
-                                for(int i = 0; i < PoleList.size(); i++)
-                                {
-                                    if(fabs(Polelist.at(i).distance) < fabs(temp.distance))
-                                        temp = PoleList.at(i);
-                                }
-                                response = OK;
-                                state = 1;
-                            }
-                            else
-                            {
-                                response = NO;
-                                state = 0;
-                            }
-                        break;
-
-                        case FAR:
-                        // Process pole data
-                        break;
-
-                        case ONE:
-                        // Process pole data
-                        break;
-
-                        case TWO:
-                        // Process pole data
-                        break;
-
-                        case THREE:
-                        // Process pole data
-                        break;
-
-                        case FOUR:
-                        // Process pole data
-                        break;
-
-                        case FIVE:
-                        // Process pole data
-                        break;
-
-                        case SIX:
-                        // Process pole data
-                        break;
+                        temp = PoleList.at(0);
+                        for(int i = 0; i < PoleList.size(); i++)
+                        {
+                            if(fabs(PoleList.at(i).distance) > fabs(temp.distance))
+                                temp = PoleList.at(i);
+                        }
+                        response = OK;
                     }
-                }
+                    else
+                    {
+                        response = NO;
+                    }
+                break;
+
+                case NEAR:
+                ROS_INFO("Near");
+                    if(PoleList.size())
+                    {
+                        temp = PoleList.at(0);
+                        for(int i = 0; i < PoleList.size(); i++)
+                        {
+                            if(fabs(PoleList.at(i).distance) < fabs(temp.distance))
+                                temp = PoleList.at(i);
+                        }
+                        response = OK;
+                    }
+                    else
+                    {
+                        response = NO;
+                    }
+                break;
+
+                case ONE:
+                // Process pole data
+                break;
+
+                case TWO:
+                // Process pole data
+                break;
+
+                case THREE:
+                // Process pole data
+                break;
+
+                case FOUR:
+                // Process pole data
+                break;
+
+                case FIVE:
+                // Process pole data
+                break;
+
+                case SIX:
+                // Process pole data
+                break;
+
+                default:
+                    ROS_INFO("Bruh %d", instruction);
+                break;
+            }
+
+            if(response == OK)
+            {
+                res = response;
+                memcpy(&sending[0], &res, 1);
+                memcpy(&sending[1], &temp.x, 8);
+                memcpy(&sending[9], &temp.y, 8);
+                memcpy(&sending[17], &temp.distance, 8);
+            }
+            else
+            {
+                res = response;
+                memcpy(&sending[0], &res, 1);
+                memcpy(&sending[1], &zero, 8);
+                memcpy(&sending[9], &zero, 8);
+                memcpy(&sending[17], &zero, 8);
+            }
+
+            memcpy(&sent_res, &sending[0], 1);
+            memcpy(&sent_x, &sending[1], 8);
+            memcpy(&sent_y, &sending[9], 8);
+            memcpy(&sent_distance, &sending[17], 8);
+            
+            ROS_INFO("Sending: Response: %d, X: %.2lf, Y: %.2lf, Distance: %.2lf", sent_res, sent_x, sent_y, sent_distance);
+            
+            do
+            {
+                send(s, sending, 25, MSG_WAITALL);
+            }
+            while(recv(s, receive, 25, MSG_WAITALL) < 0);
+
+            memcpy(&received_res, &receive[0], 1);
+            memcpy(&received_x, &receive[1], 8);
+            memcpy(&received_y, &receive[9], 8);
+            memcpy(&received_distance, &receive[17], 8);
+            ROS_INFO("Received Response: %d X: %.2lf Y: %.2lf Dist: %.2lf", received_res, received_x, received_y, received_distance);
+        
+            ROS_INFO("Done\n");
         }
+        
     }
 
 #ifndef SERIALLIB
