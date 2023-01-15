@@ -80,10 +80,9 @@ void ObstacleCallback(const obstacle_detector::Obstacles obs)
                 pole.distance = sqrt(pow(circle.center.x, 2) + pow(circle.center.y, 2));
                 PoleList.push_back(pole);
                 counts++;
-                ROS_INFO("Circle %d at X: %lf Y: %lf Distance: %lf", counts, circle.center.x, circle.center.y, sqrt(pow(circle.center.x, 2) + pow(circle.center.y, 2)));
+                // ROS_INFO("Circle %d at X: %lf Y: %lf Distance: %lf", counts, circle.center.x, circle.center.y, sqrt(pow(circle.center.x, 2) + pow(circle.center.y, 2)));
             }
         }
-        ROS_INFO("Done");
     }
     else
     {
@@ -163,6 +162,22 @@ int main(int argc, char** argv)
         connect(s, (struct sockaddr *)&addr, sizeof(addr));
     }
 
+    // Check for boot up
+    sending[0] = 0x01;
+    response = OK;
+    res = response;
+    sending[1] = res;
+
+    // while(receive[0] != OK)
+    // {
+        do
+        {
+            send(s, sending, 2, MSG_WAITALL);
+            ROS_INFO("Booting");
+        }
+        while(recv(s, receive, 1, MSG_WAITALL) < 0);
+    // }
+
 #else
     char errorOpening = serial.openDevice(SERIAL_PORT, 115200);
     if (errorOpening != 1)
@@ -182,22 +197,6 @@ int main(int argc, char** argv)
     // ros::waitForShutdown();
     while(ros::ok())
     {
-        // Check for boot up
-        sending[0] = 0x01;
-        response = OK;
-        res = response;
-        sending[1] = res;
-
-        while(receive[0] != OK)
-        {
-            do
-            {
-                send(s, sending, 2, MSG_WAITALL);
-                ROS_INFO("Booting");
-            }
-            while(recv(s, receive, 1, MSG_WAITALL) < 0);
-        }
-
         // Wait for instruction
         recv(s, receive, 2, MSG_WAITALL);
 
