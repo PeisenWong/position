@@ -422,7 +422,7 @@ char serialib::writeBytes(const void *Buffer, const unsigned int NbBytes)
      \return -1 error while setting the Timeout
      \return -2 error while reading the byte
   */
-char serialib::readChar(char *pByte,unsigned int timeOut_ms)
+char serialib::readChar(void *pByte,unsigned int timeOut_ms)
 {
 #if defined (_WIN32) || defined(_WIN64)
     // Number of bytes read
@@ -624,7 +624,7 @@ int serialib::readBytes (void *buffer,unsigned int maxNbBytes,unsigned int timeO
     // Initialise the timer
     timer.initTimer();
     unsigned int     NbByteRead=0;
-    // While Timeout is not reached
+    // // While Timeout is not reached
     while (timer.elapsedTime_ms()<timeOut_ms || timeOut_ms==0)
     {
         // Compute the position of the current byte
@@ -646,7 +646,15 @@ int serialib::readBytes (void *buffer,unsigned int maxNbBytes,unsigned int timeO
         // Suspend the loop to avoid charging the CPU
         usleep (sleepDuration_us);
     }
-    // Timeout reached, return the number of bytes read
+    // while(timeOut_ms == 0)
+    // {
+    //     int Ret=read(fd,(void*)buffer,maxNbBytes);
+    
+    //     if (Ret==-1) return -2;
+
+    //     if (NbByteRead==maxNbBytes)
+    //         return NbByteRead;
+    // }
     return NbByteRead;
 #endif
 }

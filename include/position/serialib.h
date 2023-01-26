@@ -122,7 +122,7 @@ public:
     char    writeChar   (char);
 
     // Read a char (with timeout)
-    char    readChar    (char *pByte,const unsigned int timeOut_ms=0);
+    char    readChar    (void *pByte,const unsigned int timeOut_ms=0);
 
 
 
