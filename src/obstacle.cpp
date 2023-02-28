@@ -65,6 +65,7 @@ void ObstacleCallback(const obstacle_detector::Obstacles obs)
 {
     ros::NodeHandle nh;
     counts = 0;
+    PoleList.clear();
     if(nh.getParam("/obstacle_extractor/min_circle_radius", p_min_r1) 
     && nh.getParam("/obstacle_extractor/max_circle_radius", p_max_r1) 
     && nh.getParam("/obstacle_extractor/min_circle_radius2", p_min_r2)
@@ -145,7 +146,7 @@ int main(int argc, char** argv)
 #ifndef SERIALLIB
     // To enable ps4 control from mainboard
     struct sockaddr_rc addr = { 0 };
-    char dest[18] = "98:D3:31:FD:5D:98";
+    char dest[18] = "98:DA:60:01:F2:86";
 
     // allocate a socket
     s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
