@@ -65,7 +65,7 @@ void ObstacleCallback(const obstacle_detector::Obstacles obs)
 {
     ros::NodeHandle nh;
     counts = 0;
-    PoleList.clear();
+    // PoleList.clear();
     if(nh.getParam("/obstacle_extractor/min_circle_radius", p_min_r1) 
     && nh.getParam("/obstacle_extractor/max_circle_radius", p_max_r1) 
     && nh.getParam("/obstacle_extractor/min_circle_radius2", p_min_r2)
@@ -89,8 +89,6 @@ void ObstacleCallback(const obstacle_detector::Obstacles obs)
     {
         ROS_INFO("Bruh, no param");
     }
-
-    // PoleList.clear();
 
 #ifdef CONTINUOUS
     if(counts > 0 && counts <= 10)
