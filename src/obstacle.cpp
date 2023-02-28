@@ -65,6 +65,7 @@ void ObstacleCallback(const obstacle_detector::Obstacles obs)
 {
     ros::NodeHandle nh;
     counts = 0;
+    PoleList.clear();
     if(nh.getParam("/obstacle_extractor/min_circle_radius", p_min_r1) 
     && nh.getParam("/obstacle_extractor/max_circle_radius", p_max_r1) 
     && nh.getParam("/obstacle_extractor/min_circle_radius2", p_min_r2)
@@ -80,7 +81,7 @@ void ObstacleCallback(const obstacle_detector::Obstacles obs)
                 pole.distance = sqrt(pow(circle.center.x, 2) + pow(circle.center.y, 2));
                 PoleList.push_back(pole);
                 counts++;
-                // ROS_INFO("Circle %d at X: %lf Y: %lf Distance: %lf", counts, circle.center.x, circle.center.y, sqrt(pow(circle.center.x, 2) + pow(circle.center.y, 2)));
+                ROS_INFO("Circle %d at X: %lf Y: %lf Distance: %lf", counts, circle.center.x, circle.center.y, sqrt(pow(circle.center.x, 2) + pow(circle.center.y, 2)));
             }
         }
     }
