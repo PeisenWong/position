@@ -89,7 +89,7 @@ void ObstacleCallback(const obstacle_detector::Obstacles obs)
         ROS_INFO("Bruh, no param");
     }
 
-    PoleList.clear();
+    // PoleList.clear();
 
 #ifdef CONTINUOUS
     if(counts > 0 && counts <= 10)
