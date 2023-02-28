@@ -13,14 +13,14 @@
 
 // #define SERIALLIB
 // #define CONTINUOUS
-#define SERIAL_PORT "/dev/ttyUSB1"
+#define SERIAL_PORT "/dev/ttyUSB2"
 serialib serial;
 
 using namespace std;
 
 int received_counts, counts;
 double received_x, received_y, received_distance, sent_x, sent_y, sent_distance, zero = 0;
-int s;
+int s, i = 0;
 double distances;
 uint8_t receive[500], sending[500], ack = 0x01;
 double p_min_r1, p_max_r1, p_min_r2, p_max_r2;
@@ -65,7 +65,7 @@ void ObstacleCallback(const obstacle_detector::Obstacles obs)
 {
     ros::NodeHandle nh;
     counts = 0;
-    // PoleList.clear();
+    PoleList.clear();
     if(nh.getParam("/obstacle_extractor/min_circle_radius", p_min_r1) 
     && nh.getParam("/obstacle_extractor/max_circle_radius", p_max_r1) 
     && nh.getParam("/obstacle_extractor/min_circle_radius2", p_min_r2)
@@ -175,7 +175,6 @@ int main(int argc, char** argv)
         ROS_INFO("Booting");
     }
     while(recv(s, receive, 1, MSG_WAITALL) < 0);
-    
 
 #else
     char errorOpening = serial.openDevice(SERIAL_PORT, 115200);
@@ -184,6 +183,27 @@ int main(int argc, char** argv)
         printf("Haven't or cannot connect to COM\n");
         return errorOpening;
     }
+
+    // Check for boot up
+    sending[0] = 0x01;
+    response = OK;
+    res = response;
+    sending[1] = res;
+
+    serial.writeBytes(sending, 2);
+    ROS_INFO("Booting");
+
+    while(i < 1)
+    {
+        if(serial.readChar(receive + i, 0) > 0)
+            i++;
+        else  
+            ROS_INFO("Bruh, Boot fail");
+    }
+
+    ROS_INFO("Boot Done");
+    i = 0;
+
 #endif
     
     ros::init(argc, argv, "obstacle");
@@ -193,16 +213,25 @@ int main(int argc, char** argv)
     ros::AsyncSpinner spinner(2); 
     spinner.start();
 
-    // ros::waitForShutdown();
     while(ros::ok())
     {
         // Wait for instruction
+#ifndef SERIALLIB
         recv(s, receive, 2, MSG_WAITALL);
+#else
+        // serial.readBytes(receive, 2, 0, 0);
+        while(i < 2)
+        {
+            if(serial.readChar(receive + i, 0) > 0)
+                i++;
+        }
+        ROS_INFO("OK");
+        i = 0;
+#endif
 
         if(receive[0] == 0x01)
         {
             memcpy(&instruction, &receive[1], 1);
-            // instruction = inst;
             switch(instruction)
             {
                 case FAR: // Give the far pole data
@@ -293,12 +322,24 @@ int main(int argc, char** argv)
             memcpy(&sent_distance, &sending[17], 8);
             
             ROS_INFO("Sending: Response: %d, X: %.2lf, Y: %.2lf, Distance: %.2lf", sent_res, sent_x, sent_y, sent_distance);
-            
+
+#ifndef SERIALLIB
             do
             {
                 send(s, sending, 25, MSG_WAITALL);
             }
             while(recv(s, receive, 25, MSG_WAITALL) < 0);
+#else
+            serial.writeBytes(sending, 25);
+            ROS_INFO("Sending");
+            
+            while(i < 25)
+            {
+                if(serial.readChar(receive + i, 0) > 0)
+                    i++;
+            }     
+            i = 0;  
+#endif
 
             memcpy(&received_res, &receive[0], 1);
             memcpy(&received_x, &receive[1], 8);
@@ -308,10 +349,11 @@ int main(int argc, char** argv)
         
             ROS_INFO("Done\n");
         }
-        
     }
 
 #ifndef SERIALLIB
     close(s);
+#else
+    serial.closeDevice();
 #endif
 }
