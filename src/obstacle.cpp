@@ -89,6 +89,8 @@ void ObstacleCallback(const obstacle_detector::Obstacles obs)
         ROS_INFO("Bruh, no param");
     }
 
+    PoleList.clear();
+
 #ifdef CONTINUOUS
     if(counts > 0 && counts <= 10)
     {
@@ -145,7 +147,7 @@ int main(int argc, char** argv)
 #ifndef SERIALLIB
     // To enable ps4 control from mainboard
     struct sockaddr_rc addr = { 0 };
-    char dest[18] = "98:D3:31:FD:5D:98";
+    char dest[18] = "98:DA:60:01:F2:86";
 
     // allocate a socket
     s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
@@ -168,15 +170,13 @@ int main(int argc, char** argv)
     res = response;
     sending[1] = res;
 
-    // while(receive[0] != OK)
-    // {
-        do
-        {
-            send(s, sending, 2, MSG_WAITALL);
-            ROS_INFO("Booting");
-        }
-        while(recv(s, receive, 1, MSG_WAITALL) < 0);
-    // }
+    do
+    {
+        send(s, sending, 2, MSG_WAITALL);
+        ROS_INFO("Booting");
+    }
+    while(recv(s, receive, 1, MSG_WAITALL) < 0);
+    
 
 #else
     char errorOpening = serial.openDevice(SERIAL_PORT, 115200);
