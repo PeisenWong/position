@@ -208,6 +208,17 @@ int main(int argc, char** argv)
     
     ros::init(argc, argv, "obstacle");
     ros::NodeHandle n;
+
+    // Wait for the node to synchronize with the system clock
+    while (!ros::Time::isSystemTime())
+    {
+        ROS_INFO("Waiting for system time synchronization...");
+        ros::Duration(0.5).sleep();
+    }
+
+    // Node is now time synchronized
+    ROS_INFO("Node is time synchronized!");
+    
     ros::Subscriber sub = n.subscribe<obstacle_detector::Obstacles>("/tracked_obstacles", 10, ObstacleCallback);
 
     ros::AsyncSpinner spinner(2); 
