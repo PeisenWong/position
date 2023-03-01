@@ -81,7 +81,7 @@ void ObstacleCallback(const obstacle_detector::Obstacles obs)
                 pole.distance = sqrt(pow(circle.center.x, 2) + pow(circle.center.y, 2));
                 PoleList.push_back(pole);
                 counts++;
-                ROS_INFO("Circle %d at X: %.2lf Y: %.2lf D: %.2lf R: %.2lf", counts, circle.center.x, circle.center.y, sqrt(pow(circle.center.x, 2) + pow(circle.center.y, 2)), circle.true_radius);
+                ROS_INFO("Circle %d at X: %.2lf Y: %.2lf D: %.2lf R: %.4lf", counts, circle.center.x, circle.center.y, sqrt(pow(circle.center.x, 2) + pow(circle.center.y, 2)), circle.true_radius);
             }
         }
     }
