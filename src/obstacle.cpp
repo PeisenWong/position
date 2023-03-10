@@ -368,3 +368,5 @@ int main(int argc, char** argv)
     serial.closeDevice();
 #endif
 }
+
+// Testing
