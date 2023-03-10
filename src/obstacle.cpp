@@ -71,6 +71,7 @@ void ObstacleCallback(const obstacle_detector::Obstacles obs)
     && nh.getParam("/obstacle_extractor/min_circle_radius2", p_min_r2)
     && nh.getParam("/obstacle_extractor/max_circle_radius2", p_max_r2))
     {
+        
         for(const auto& circle : obs.circles)
         {
             if((circle.true_radius >= p_min_r1 && circle.true_radius <= p_max_r1) 
@@ -81,10 +82,11 @@ void ObstacleCallback(const obstacle_detector::Obstacles obs)
                 pole.distance = sqrt(pow(circle.center.x, 2) + pow(circle.center.y, 2));
                 PoleList.push_back(pole);
                 counts++;
-                ROS_INFO("Circle %d at X: %lf Y: %lf Distance: %lf", counts, circle.center.x, circle.center.y, sqrt(pow(circle.center.x, 2) + pow(circle.center.y, 2)));
+                ROS_INFO("Circle %d at X: %.2lf Y: %.2lf D: %.2lf R: %.4lf", counts, circle.center.x, circle.center.y, sqrt(pow(circle.center.x, 2) + pow(circle.center.y, 2)), circle.true_radius);
             }
         }
     }
+
     else
     {
         ROS_INFO("Bruh, no param");
@@ -183,7 +185,8 @@ int main(int argc, char** argv)
         printf("Haven't or cannot connect to COM\n");
         return errorOpening;
     }
-
+    
+    // Hi
     // Check for boot up
     sending[0] = 0x01;
     response = OK;
@@ -208,6 +211,17 @@ int main(int argc, char** argv)
     
     ros::init(argc, argv, "obstacle");
     ros::NodeHandle n;
+
+    // Wait for the node to synchronize with the system clock
+    while (!ros::Time::isSystemTime())
+    {
+        ROS_INFO("Waiting for system time synchronization...");
+        ros::Duration(0.5).sleep();
+    }
+
+    // Node is now time synchronized
+    ROS_INFO("Node is time synchronized!");
+    
     ros::Subscriber sub = n.subscribe<obstacle_detector::Obstacles>("/tracked_obstacles", 10, ObstacleCallback);
 
     ros::AsyncSpinner spinner(2); 
@@ -357,3 +371,6 @@ int main(int argc, char** argv)
     serial.closeDevice();
 #endif
 }
+
+
+// Testing

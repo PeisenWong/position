@@ -1,4 +1,4 @@
-/*!
+git commit -m "first commit"/*!
 \file    serialib.h
 \brief   Header file of the class serialib. This class is used for communication over a serial device.
 \author  Philippe Lucidarme (University of Angers)
@@ -122,7 +122,7 @@ public:
     char    writeChar   (char);
 
     // Read a char (with timeout)
-    char    readChar    (void *pByte,const unsigned int timeOut_ms=0);
+    char    readChar    (char *pByte,const unsigned int timeOut_ms=0);
 
 
 
