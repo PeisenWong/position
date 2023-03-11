@@ -78,7 +78,7 @@ void ObstacleCallback(const obstacle_detector::Obstacles obs)
                 pole.x = circle.center.x;
                 pole.y = circle.center.y;
                 double temp = pole.x;
-             //  pole.x = pole.y*-1;
+               pole.x = pole.y*-1;
                 pole.y = temp ;
                 
 // [1678542218.486194939]: Circle 1 at X: 0.12 Y: -1.27 D: 1.28 R: 0.0650
@@ -89,7 +89,7 @@ void ObstacleCallback(const obstacle_detector::Obstacles obs)
                 pole.distance = sqrt(pow(circle.center.x, 2) + pow(circle.center.y, 2));
                 PoleList.push_back(pole);
                 counts++;
-                ROS_INFO("Circle %d at X: %.2lf Y: %.2lf D: %.2lf R: %.4lf", counts, circle.center.x, circle.center.y, sqrt(pow(circle.center.x, 2) + pow(circle.center.y, 2)), circle.true_radius);
+                ROS_INFO("Circle %d at X: %.2lf Y: %.2lf D: %.2lf R: %.4lf", counts, pole.x, pole.y, sqrt(pow(circle.center.x, 2) + pow(circle.center.y, 2)), circle.true_radius);
             }
 
 
