@@ -80,8 +80,7 @@ void ObstacleCallback(const obstacle_detector::Obstacles obs)
                 auto temp = pole.x;
                 pole.x = pole.y;
                 pole.y = temp * -1;
-
-
+                
                 pole.distance = sqrt(pow(circle.center.x, 2) + pow(circle.center.y, 2));
                 PoleList.push_back(pole);
                 counts++;
@@ -166,11 +165,11 @@ int main(int argc, char** argv)
     str2ba( dest, &addr.rc_bdaddr );    
 
     // connect to server
-    while(connect(s, (struct sockaddr *)&addr, sizeof(addr)) != 0)
-    {
-        ROS_INFO("Havent Connect");
-        connect(s, (struct sockaddr *)&addr, sizeof(addr));
-    }
+   // while(connect(s, (struct sockaddr *)&addr, sizeof(addr)) != 0)
+    //{
+    //    ROS_INFO("Havent Connect");
+   //     connect(s, (struct sockaddr *)&addr, sizeof(addr));
+    //W}
 
     // Check for boot up
     sending[0] = 0x01;
