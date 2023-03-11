@@ -177,12 +177,12 @@ int main(int argc, char** argv)
     res = response;
     sending[1] = res;
 
-    do
-    {
-        send(s, sending, 2, MSG_WAITALL);
-        ROS_INFO("Booting");
-    }
-    while(recv(s, receive, 1, MSG_WAITALL) < 0);
+    // do
+    // {
+    //     send(s, sending, 2, MSG_WAITALL);
+    //     ROS_INFO("Booting");
+    // }
+    // while(recv(s, receive, 1, MSG_WAITALL) < 0);
 
 #else
     char errorOpening = serial.openDevice(SERIAL_PORT, 115200);
