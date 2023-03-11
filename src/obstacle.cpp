@@ -73,16 +73,25 @@ void ObstacleCallback(const obstacle_detector::Obstacles obs)
     {
         for(const auto& circle : obs.circles)
         {
-            if((circle.true_radius >= p_min_r1 && circle.true_radius <= p_max_r1) 
-            || (circle.true_radius >= p_min_r2 && circle.true_radius <= p_max_r2))
+            if((circle.true_radius >= p_min_r1 && circle.true_radius <= p_max_r1)||(circle.true_radius >= p_min_r2 && circle.true_radius <= p_max_r2))
             {
                 pole.x = circle.center.x;
                 pole.y = circle.center.y;
+                auto temp = pole.x;
+                pole.x = pole.y;
+                pole.y = temp * -1;
+
+
                 pole.distance = sqrt(pow(circle.center.x, 2) + pow(circle.center.y, 2));
                 PoleList.push_back(pole);
                 counts++;
                 ROS_INFO("Circle %d at X: %.2lf Y: %.2lf D: %.2lf R: %.4lf", counts, circle.center.x, circle.center.y, sqrt(pow(circle.center.x, 2) + pow(circle.center.y, 2)), circle.true_radius);
             }
+
+
+
+
+
         }
     }
     else
