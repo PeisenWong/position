@@ -79,7 +79,7 @@ void ObstacleCallback(const obstacle_detector::Obstacles obs)
                 pole.y = circle.center.y;
                 auto temp = pole.x;
              //  pole.x = pole.y*-1;
-               // pole.y = temp ;
+                pole.y = temp ;
                 
 // [1678542218.486194939]: Circle 1 at X: 0.12 Y: -1.27 D: 1.28 R: 0.0650
 
