@@ -1,5 +1,13 @@
 <launch>
-    
+    <arg name="min_x_limit"         default="-3.0"/>
+    <arg name="max_x_limit"        default="3.0"/>
+    <arg name="min_y_limit"        default="-3.0"/>
+    <arg name="max_y_limit"        default="3.0"/>
+    <arg name="max_circle_radius"         default="0.07"/>
+    <arg name="min_circle_radius"        default="0.05"/>
+    <arg name="max_circle_radius2"        default="0.09"/>
+    <arg name="min_circle_radius2"        default="0.08"/>
+
     <!-- Activate rplidar (Publish laser scan data to topic /scan) -->
     <node name="rplidarNode"          pkg="rplidar_ros"  type="rplidarNode" output="screen">
         <param name="serial_port"         type="string" value="/dev/rplidar"/>  
@@ -49,16 +57,16 @@
         <param name="max_split_distance"   value="0.2"/>
         <param name="max_merge_separation" value="0.2"/>
         <param name="max_merge_spread"     value="0.2"/>
-        <param name="max_circle_radius"    value="0.07"/>
-        <param name="min_circle_radius"    value="0.05"/>
-        <param name="max_circle_radius2"    value="0.09"/>
-        <param name="min_circle_radius2"    value="0.08"/>
+        <param name="max_circle_radius"   type="double" value="$(arg max_circle_radius)"/>
+        <param name="min_circle_radius"   type="double" value="$(arg min_circle_radius)"/>
+        <param name="max_circle_radius2"  type="double"  value="$(arg max_circle_radius2)"/>
+        <param name="min_circle_radius2"  type="double" value="$(arg min_circle_radius2)"/>
         <param name="radius_enlargement"   value="0.3"/>
 
-        <param name="min_x_limit"    value="-3.0"/>
-        <param name="min_y_limit"    value="-3.0"/>
-        <param name="max_x_limit"    value="3.0"/>
-        <param name="max_y_limit"    value="3.0"/>
+        <param name="min_x_limit"   type="double" value="$(arg min_x_limit)"/>
+        <param name="min_y_limit"   type="double" value="$(arg min_y_limit)"/>
+        <param name="max_x_limit"   type="double" value="$(arg max_x_limit)"/>
+        <param name="max_y_limit"   type="double" value="$(arg max_y_limit)"/>
 
         <param name="frame_id"             value="front_scanner"/>
     </node>
@@ -80,7 +88,7 @@
 
     <!-- Obstacle Publisher -->
     <node name="obstacle_publisher" pkg="obstacle_detector" type="obstacle_publisher_node">
-        <param name="active"           value="true"/>
+        <param name="active"           value="false"/>
         <param name="reset"            value="false"/>
 
         <param name="fusion_example"   value="false"/>
@@ -103,7 +111,7 @@
     <node pkg="tf" type="static_transform_publisher" name="base_to_map" args="0 0 0 0 0 0 map robot 100" />
 
     <!-- Process obstacle data -->
-    <node name="process" pkg="position" type="obstacle" output="screen"/>
+    <!-- <node name="process" pkg="position" type="obstacle" output="screen"/> -->
 
     <!-- Map Generation -->
     <node name="map" pkg="position" type="map">
@@ -114,7 +122,7 @@
     </node>
 
     <!-- Process obstacle data -->
-    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find position)/obstacle_detector.rviz"/>
+    <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find position)/obstacle_detector.rviz"/> -->
 
 
 </launch>

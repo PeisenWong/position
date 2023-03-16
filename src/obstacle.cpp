@@ -18,7 +18,7 @@ serialib serial;
 
 using namespace std;
 
-int received_counts, counts;
+int received_counts, counts, ready;
 double received_x, received_y, received_distance, sent_x, sent_y, sent_distance, zero = 0;
 int s, i = 0;
 double distances;
@@ -66,6 +66,7 @@ void ObstacleCallback(const obstacle_detector::Obstacles obs)
     ros::NodeHandle nh;
     counts = 0;
     PoleList.clear();
+    ready = 0;
     if(nh.getParam("/obstacle_extractor/min_circle_radius", p_min_r1) 
     && nh.getParam("/obstacle_extractor/max_circle_radius", p_max_r1) 
     && nh.getParam("/obstacle_extractor/min_circle_radius2", p_min_r2)
@@ -84,6 +85,8 @@ void ObstacleCallback(const obstacle_detector::Obstacles obs)
                 ROS_INFO("Circle %d at X: %lf Y: %lf Distance: %lf", counts, circle.center.x, circle.center.y, sqrt(pow(circle.center.x, 2) + pow(circle.center.y, 2)));
             }
         }
+
+        ready = 1;
     }
     else
     {
@@ -232,6 +235,7 @@ int main(int argc, char** argv)
         if(receive[0] == 0x01)
         {
             memcpy(&instruction, &receive[1], 1);
+            while(ready != 1);
             switch(instruction)
             {
                 case FAR: // Give the far pole data
