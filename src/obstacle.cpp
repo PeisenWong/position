@@ -146,7 +146,7 @@ int main(int argc, char** argv)
 #ifndef SERIALLIB
     // To enable ps4 control from mainboard
     struct sockaddr_rc addr = { 0 };
-    char dest[18] = "98:DA:60:01:F0:E7";
+    char dest[18] = "98:D3:51:FD:E3:FE"; // hahaha
 
     // allocate a socket
     s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
